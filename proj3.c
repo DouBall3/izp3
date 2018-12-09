@@ -371,6 +371,7 @@ int main(int argc, char *argv[])
         return 1;
     }
     int lines = load_clusters(argv[1],&clusters);
+    printf("Nacteno lines: %d\n",lines);
     if(n > lines)
     {
         fputs("N can't be larger than number of objects",stderr);
@@ -389,6 +390,7 @@ int main(int argc, char *argv[])
         }
         // odstraneni shluku v poli z indexu `c2_idx`
         lines = remove_cluster(clusters, lines, c2_idx);
+        printf("V while: %d\n",lines);
     }
     printf("Lines: %d\n",lines);
     print_clusters(clusters,lines);
