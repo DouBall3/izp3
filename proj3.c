@@ -192,8 +192,8 @@ int remove_cluster(struct cluster_t *carr, int narr, int idx)
 {
     assert(idx < narr);
     assert(narr > 0);
-    if(idx < narr) return -1;
-    if(narr > 0) return -1;
+    if(!(idx < narr)) return -1;
+    if(!(narr > 0)) return -1;
     carr[idx].obj = NULL;
     carr->size--;
     return narr-1;
