@@ -254,7 +254,7 @@ void find_neighbours(struct cluster_t *carr, int narr, int *c1, int *c2)
     float distance, min_distance = -1;
     for(int i = 0; i < narr; i++)
     {
-        for(int j = 0; j < narr; j++)
+        for(int j = i+1; j < narr; j++)
         {
 	    distance = cluster_distance(&carr[i],&carr[j]);
 	    if(min_distance == -1 || distance < min_distance)
@@ -382,7 +382,7 @@ int main(int argc, char *argv[])
 	printf("c1: %d c2: %d",c1_idx,c2_idx);
         // spojovani sousednich shluku do shluku na indexu `c1_idx`
         previous_c1_size = clusters[c1_idx].size;
-        //merge_clusters(&clusters[c1_idx], &clusters[c2_idx]);
+        merge_clusters(&clusters[c1_idx], &clusters[c2_idx]);
         if (clusters[c2_idx].size > 0 && clusters[c1_idx].size != previous_c1_size + clusters[c2_idx].size) {
             fputs("Chyba alokace pameti.",stderr);
             return -1;
