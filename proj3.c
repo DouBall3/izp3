@@ -177,7 +177,7 @@ void merge_clusters(struct cluster_t *c1, struct cluster_t *c2)
     {
         append_cluster(c1,c2->obj[i]);
     }
-    sort_cluster(c1);
+    sort_cluster(&(*c1));
 }
 
 /**********************************************************************/
@@ -194,8 +194,11 @@ int remove_cluster(struct cluster_t *carr, int narr, int idx)
     assert(narr > 0);
     if(!(idx < narr)) return -1;
     if(!(narr > 0)) return -1;
-    carr[idx].obj = NULL;
-    carr->size--;
+    clear_cluster(&carr[idx]);
+    for(int i = idx; i < narr; i++)
+    {
+	carr[i] = carr[i + 1];
+    }
     return narr-1;
 }
 
@@ -208,7 +211,8 @@ float obj_distance(struct obj_t *o1, struct obj_t *o2)
     assert(o2 != NULL);
     if(o1 == NULL) return -1;
     if(o2 == NULL) return -1;
-    float distance = sqrt(pow(o1->x - o2->x, 2) + pow(o1->y - o2->y, 2));
+    float distance = sqrtf(pow(o1->x - o2->x, 2) + pow(o1->y - o2->y, 2));
+    //printf("Distance in obj_distance: %f\n", distance);
     return distance;
 }
 
@@ -232,9 +236,11 @@ float cluster_distance(struct cluster_t *c1, struct cluster_t *c2)
     {
         for( int i = 0; i < c2->size;i++)
         {
-            if(distance > obj_distance(&c1->obj[i],&c2->obj[j]))
+	     //printf("Distance in cluster_distance: %f\n", distance);
+
+            if(distance < obj_distance(&c1->obj[j],&c2->obj[i]))
             {
-                distance = obj_distance(&c1->obj[i],&c2->obj[j]);
+                distance = obj_distance(&c1->obj[j],&c2->obj[i]);
             }
         }
     }
@@ -254,12 +260,14 @@ void find_neighbours(struct cluster_t *carr, int narr, int *c1, int *c2)
     float distance, min_distance = -1;
     for(int i = 0; i < narr; i++)
     {
-        for(int j = i+1; j < narr; j++)
+        for(int j = 0; j < narr; j++)
         {
+	    if(i == j) continue;
 	    distance = cluster_distance(&carr[i],&carr[j]);
 	    if(min_distance == -1 || distance < min_distance)
 	    {
 		min_distance = distance;
+		//printf("Distance: %f\n", distance);
 		*c1 = i;
 		*c2 = j;
 	    }
@@ -365,13 +373,14 @@ int main(int argc, char *argv[])
     }
     char* end;
     int n = (int) strtol(argv[2],&end,10);
-    if(!n)
+    if(n < 1)
     {
-        fputs("N has to be number",stderr);
+        fputs("N has to be positive number",stderr);
         return 1;
     }
     int lines = load_clusters(argv[1],&clusters);
-    printf("Nacteno lines: %d\n",lines);
+    int loaded = lines;
+    //printf("Nacteno lines: %d\n",lines);
     if(n > lines)
     {
         fputs("N can't be larger than number of objects",stderr);
@@ -380,7 +389,7 @@ int main(int argc, char *argv[])
     while (lines > n) {
         // hledani sousednich shluku
         find_neighbours(clusters, lines, &c1_idx, &c2_idx);
-	printf("c1: %d c2: %d\n",c1_idx,c2_idx);
+	//printf("c1: %d c2: %d\n",c1_idx,c2_idx);
         // spojovani sousednich shluku do shluku na indexu `c1_idx`
         previous_c1_size = clusters[c1_idx].size;
         merge_clusters(&clusters[c1_idx], &clusters[c2_idx]);
@@ -390,9 +399,11 @@ int main(int argc, char *argv[])
         }
         // odstraneni shluku v poli z indexu `c2_idx`
         lines = remove_cluster(clusters, lines, c2_idx);
-        printf("V while: %d\n",lines);
+        //lines--;
+	//printf("V while: %d\n",lines);
     }
-    printf("Lines: %d\n",lines);
+    
+    //printf("Lines: %d\n",lines);
     print_clusters(clusters,lines);
     for(int i = 0; i < lines; i++)
     {
@@ -401,5 +412,3 @@ int main(int argc, char *argv[])
     free(clusters);
     return 0;
 }
-
-
