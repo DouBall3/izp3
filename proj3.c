@@ -379,7 +379,7 @@ int main(int argc, char *argv[])
     while (lines > n) {
         // hledani sousednich shluku
         find_neighbours(clusters, lines, &c1_idx, &c2_idx);
-	printf("c1: %d c2: %d",c1_idx,c2_idx);
+	printf("c1: %d c2: %d\n",c1_idx,c2_idx);
         // spojovani sousednich shluku do shluku na indexu `c1_idx`
         previous_c1_size = clusters[c1_idx].size;
         merge_clusters(&clusters[c1_idx], &clusters[c2_idx]);
@@ -390,6 +390,7 @@ int main(int argc, char *argv[])
         // odstraneni shluku v poli z indexu `c2_idx`
         lines = remove_cluster(clusters, lines, c2_idx);
     }
+    printf("Lines: %d\n",lines);
     print_clusters(clusters,lines);
     for(int i = 0; i < lines; i++)
     {
