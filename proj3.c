@@ -140,7 +140,7 @@ struct cluster_t *resize_cluster(struct cluster_t *c, int new_cap)
     if (arr == NULL)
         return NULL;
 
-    c->obj = (struct obj_t*)arr;
+    c->obj = arr;
     c->capacity = new_cap;
     return c;
 }
@@ -177,7 +177,7 @@ void merge_clusters(struct cluster_t *c1, struct cluster_t *c2)
     {
         append_cluster(c1,c2->obj[i]);
     }
-    //sort_cluster(c1);
+    sort_cluster(c1);
 }
 
 /**********************************************************************/
@@ -232,9 +232,9 @@ float cluster_distance(struct cluster_t *c1, struct cluster_t *c2)
     {
         for( int i = 0; i < c2->size;i++)
         {
-            if(distance > obj_distance(&(c1->obj[i]),&(c2->obj[j])))
+            if(distance > obj_distance(&c1->obj[i],&c2->obj[j]))
             {
-                distance = obj_distance(&(c1->obj[i]),&(c2->obj[j]));
+                distance = obj_distance(&c1->obj[i],&c2->obj[j]);
             }
         }
     }
@@ -251,14 +251,15 @@ void find_neighbours(struct cluster_t *carr, int narr, int *c1, int *c2)
 {
     assert(narr > 0);
 
-    float distance = 0;
+    float distance, min_distance = -1;
     for(int i = 0; i < narr; i++)
     {
         for(int j = 0; j < narr; j++)
         {
-	    if(distance > cluster_distance(&carr[i],&carr[j]))
+	    distance = cluster_distance(&carr[i],&carr[j]);
+	    if(min_distance == -1 || distance < min_distance)
 	    {
-		distance = cluster_distance(&carr[i],&carr[j]);
+		min_distance = distance;
 		*c1 = i;
 		*c2 = j;
 	    }
@@ -355,7 +356,7 @@ void print_clusters(struct cluster_t *carr, int narr)
 int main(int argc, char *argv[])
 {
     struct cluster_t *clusters;
-    int c1_idx, c2_idx, previous_c1_size;
+    int c1_idx = 0, c2_idx = 0, previous_c1_size = 0;
 
     if(argc != 3 && argc != 2)
     {
@@ -378,9 +379,10 @@ int main(int argc, char *argv[])
     while (lines > n) {
         // hledani sousednich shluku
         find_neighbours(clusters, lines, &c1_idx, &c2_idx);
+	printf("c1: %d c2: %d",c1_idx,c2_idx);
         // spojovani sousednich shluku do shluku na indexu `c1_idx`
         previous_c1_size = clusters[c1_idx].size;
-        merge_clusters(&clusters[c1_idx], &clusters[c2_idx]);
+        //merge_clusters(&clusters[c1_idx], &clusters[c2_idx]);
         if (clusters[c2_idx].size > 0 && clusters[c1_idx].size != previous_c1_size + clusters[c2_idx].size) {
             fputs("Chyba alokace pameti.",stderr);
             return -1;
