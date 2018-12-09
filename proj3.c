@@ -377,7 +377,7 @@ int main(int argc, char *argv[])
         fputs("N can't be larger than number of objects",stderr);
         return 1;
     }
-    while (lines > n) {
+    while (lines < n) {
         // hledani sousednich shluku
         find_neighbours(clusters, lines, &c1_idx, &c2_idx);
 	printf("c1: %d c2: %d\n",c1_idx,c2_idx);
