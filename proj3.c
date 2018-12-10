@@ -379,7 +379,7 @@ int main(int argc, char *argv[])
         return 1;
     }
     int lines = load_clusters(argv[1],&clusters);
-    int loaded = lines;
+    //int loaded = lines;
     //printf("Nacteno lines: %d\n",lines);
     if(n > lines)
     {
